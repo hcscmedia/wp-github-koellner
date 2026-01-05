@@ -78,7 +78,7 @@ class WP_GitHub_Koellner {
      */
     public function register_settings() {
         register_setting('wp_github_koellner_settings', 'wp_github_koellner_username');
-        register_setting('wp_github_koellner_settings', 'wp_github_koellner_token');
+        register_setting('wp_github_koellner_settings', 'wp_github_koellner_token', array($this, 'sanitize_token'));
         register_setting('wp_github_koellner_settings', 'wp_github_koellner_cache_time');
         
         add_settings_section(
@@ -114,6 +114,29 @@ class WP_GitHub_Koellner {
     }
     
     /**
+     * Sanitize token
+     */
+    public function sanitize_token($token) {
+        // If empty, keep the old token
+        if (empty($token)) {
+            return get_option('wp_github_koellner_token', '');
+        }
+        
+        // Validate token format (GitHub tokens are alphanumeric and underscores)
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $token)) {
+            add_settings_error(
+                'wp_github_koellner_token',
+                'invalid_token',
+                'Ungültiges Token-Format. GitHub-Tokens enthalten nur Buchstaben, Zahlen und Unterstriche.',
+                'error'
+            );
+            return get_option('wp_github_koellner_token', '');
+        }
+        
+        return sanitize_text_field($token);
+    }
+    
+    /**
      * Settings section callback
      */
     public function settings_section_callback() {
@@ -134,8 +157,13 @@ class WP_GitHub_Koellner {
      */
     public function token_field_callback() {
         $token = get_option('wp_github_koellner_token', '');
-        echo '<input type="password" name="wp_github_koellner_token" value="' . esc_attr($token) . '" class="regular-text" />';
-        echo '<p class="description">Optional: Personal Access Token für höhere API-Limits</p>';
+        $placeholder = !empty($token) ? '••••••••••••••••' : '';
+        echo '<input type="password" name="wp_github_koellner_token" value="" placeholder="' . esc_attr($placeholder) . '" class="regular-text" />';
+        if (!empty($token)) {
+            echo '<p class="description">Token ist gespeichert. Feld leer lassen, um es zu behalten, oder neues Token eingeben, um es zu ändern.</p>';
+        } else {
+            echo '<p class="description">Optional: Personal Access Token für höhere API-Limits</p>';
+        }
     }
     
     /**
@@ -204,7 +232,7 @@ class WP_GitHub_Koellner {
         );
         
         if (!empty($token)) {
-            $args['headers']['Authorization'] = 'token ' . $token;
+            $args['headers']['Authorization'] = 'Bearer ' . $token;
         }
         
         $response = wp_remote_get($url, $args);
@@ -241,6 +269,9 @@ class WP_GitHub_Koellner {
             'sort' => 'updated',
             'type' => 'owner'
         ), $atts);
+        
+        // Validate and sanitize limit
+        $atts['limit'] = max(1, min(100, intval($atts['limit'])));
         
         $username = get_option('wp_github_koellner_username', '');
         if (empty($username)) {
@@ -312,7 +343,7 @@ class WP_GitHub_Koellner {
                         
                         <div class="project-footer">
                             <span class="updated-date">
-                                Aktualisiert: <?php echo human_time_diff(strtotime($repo['updated_at']), current_time('timestamp')); ?> ago
+                                Aktualisiert vor <?php echo human_time_diff(strtotime($repo['updated_at']), current_time('timestamp')); ?>
                             </span>
                         </div>
                     </div>
