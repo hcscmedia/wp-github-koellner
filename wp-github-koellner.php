@@ -28,6 +28,11 @@ class WP_GitHub_Koellner {
     private static $instance = null;
     
     /**
+     * GitHub username validation pattern
+     */
+    const GITHUB_USERNAME_PATTERN = '/^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/';
+    
+    /**
      * Get singleton instance
      */
     public static function get_instance() {
@@ -79,8 +84,12 @@ class WP_GitHub_Koellner {
      * Register plugin settings
      */
     public function register_settings() {
-        register_setting('wp_github_koellner_settings', 'wp_github_koellner_username');
-        register_setting('wp_github_koellner_settings', 'wp_github_koellner_cache_time');
+        register_setting('wp_github_koellner_settings', 'wp_github_koellner_username', array(
+            'sanitize_callback' => array($this, 'sanitize_username'),
+        ));
+        register_setting('wp_github_koellner_settings', 'wp_github_koellner_cache_time', array(
+            'sanitize_callback' => array($this, 'sanitize_cache_time'),
+        ));
         
         add_settings_section(
             'wp_github_koellner_main',
@@ -125,6 +134,45 @@ class WP_GitHub_Koellner {
     }
     
     /**
+     * Sanitize GitHub username
+     */
+    public function sanitize_username($username) {
+        $username = sanitize_text_field($username);
+        // GitHub usernames can only contain alphanumeric characters and hyphens
+        // and cannot begin or end with a hyphen
+        if (!preg_match(self::GITHUB_USERNAME_PATTERN, $username)) {
+            add_settings_error(
+                'wp_github_koellner_username',
+                'invalid_username',
+                __('Invalid GitHub username. Username can only contain alphanumeric characters and hyphens, and cannot begin or end with a hyphen.', 'wp-github-koellner'),
+                'error'
+            );
+            // Return the previous value
+            return get_option('wp_github_koellner_username', '');
+        }
+        return $username;
+    }
+    
+    /**
+     * Sanitize cache time
+     */
+    public function sanitize_cache_time($cache_time) {
+        $cache_time = intval($cache_time);
+        // Ensure cache time is between 1 and 24 hours
+        if ($cache_time < 1 || $cache_time > 24) {
+            add_settings_error(
+                'wp_github_koellner_cache_time',
+                'invalid_cache_time',
+                __('Cache time must be between 1 and 24 hours.', 'wp-github-koellner'),
+                'error'
+            );
+            // Return default value
+            return 6;
+        }
+        return $cache_time;
+    }
+    
+    /**
      * Settings page
      */
     public function settings_page() {
@@ -161,6 +209,11 @@ class WP_GitHub_Koellner {
      * Fetch GitHub repositories
      */
     private function fetch_github_repos($username, $limit = null) {
+        // Validate username format
+        if (!preg_match(self::GITHUB_USERNAME_PATTERN, $username)) {
+            return array('error' => __('Invalid GitHub username format.', 'wp-github-koellner'));
+        }
+        
         $cache_key = 'wp_github_koellner_repos_' . $username;
         $cached_data = get_transient($cache_key);
         
@@ -190,12 +243,12 @@ class WP_GitHub_Koellner {
         
         // Check for API error
         if (isset($repos['message'])) {
-            return array('error' => $repos['message']);
+            return array('error' => sanitize_text_field($repos['message']));
         }
         
-        // Cache the results
-        $cache_time = get_option('wp_github_koellner_cache_time', '6');
-        $cache_duration = intval($cache_time) * HOUR_IN_SECONDS;
+        // Cache the results (validated by sanitize_cache_time)
+        $cache_time = intval(get_option('wp_github_koellner_cache_time', 6));
+        $cache_duration = $cache_time * HOUR_IN_SECONDS;
         set_transient($cache_key, $repos, $cache_duration);
         
         return $repos;
@@ -260,8 +313,12 @@ class WP_GitHub_Koellner {
             }
             
             if (!empty($repo['updated_at'])) {
-                $date = new DateTime($repo['updated_at']);
-                $output .= '<span class="project-updated">' . sprintf(__('Updated: %s', 'wp-github-koellner'), $date->format('M j, Y')) . '</span>';
+                try {
+                    $date = new DateTime($repo['updated_at']);
+                    $output .= '<span class="project-updated">' . sprintf(__('Updated: %s', 'wp-github-koellner'), $date->format('M j, Y')) . '</span>';
+                } catch (Exception $e) {
+                    // Skip invalid date format
+                }
             }
             
             $output .= '</div>'; // project-meta
