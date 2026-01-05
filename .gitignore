@@ -29,3 +29,4 @@ build/
 # Test files
 coverage/
 .phpunit.result.cache
+test-plugin.php
