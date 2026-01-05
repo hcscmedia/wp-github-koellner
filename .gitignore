@@ -1,0 +1,32 @@
+# WordPress
+*.log
+.htaccess
+
+# Operating Systems
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build files
+dist/
+build/
+
+# Test files
+coverage/
+.phpunit.result.cache
+test-plugin.php
