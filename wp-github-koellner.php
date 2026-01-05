@@ -332,7 +332,7 @@ class WP_GitHub_Koellner {
                                 🔀 <?php echo number_format_i18n($repo['forks_count']); ?>
                             </span>
                             
-                            <?php if (!empty($repo['watchers_count'])): ?>
+                            <?php if (isset($repo['watchers_count'])): ?>
                                 <span class="meta-item watchers">
                                     👁️ <?php echo number_format_i18n($repo['watchers_count']); ?>
                                 </span>
