@@ -2,26 +2,32 @@
 
 Ein WordPress Plugin zum Anzeigen deiner GitHub-Projekte auf deiner WordPress-Website.
 
+> 📖 **Für eine ausführliche Repository-Übersicht siehe [REPOSITORY-OVERVIEW.md](REPOSITORY-OVERVIEW.md)**
+
 ## Beschreibung
 
-WP GitHub Köllner ist ein einfaches und elegantes WordPress Plugin, das deine GitHub-Repositories auf deiner WordPress-Website anzeigt. Es nutzt die GitHub API, um deine Projekte abzurufen und zeigt sie in einem ansprechenden Grid-Layout mit wichtigen Informationen wie Sterne, Forks, Programmiersprachen und Topics an.
+WP GitHub Köllner ist ein vollständiges, produktionsreifes WordPress Plugin, das deine GitHub-Repositories auf deiner WordPress-Website anzeigt. Es nutzt die GitHub API, um deine Projekte abzurufen und zeigt sie in einem ansprechenden Grid-Layout mit umfangreichen Informationen an.
 
 ## Features
 
 - ✅ Anzeige von GitHub-Repositories über Shortcode
-- ✅ Responsive Grid-Layout
+- ✅ Responsive Grid-Layout (1-3 Spalten)
 - ✅ Caching-Mechanismus für optimale Performance
 - ✅ Anpassbare Sortierung (nach Update, Erstellung, etc.)
 - ✅ Unterstützung für GitHub Personal Access Token
-- ✅ Anzeige von Repository-Informationen:
+- ✅ Umfangreiche Repository-Informationen:
   - Name und Beschreibung
   - Programmiersprache mit Farb-Indikator
-  - Anzahl der Sterne und Forks
+  - Anzahl der Sterne, Forks und Watchers
+  - Offene Issues
+  - Repository-Lizenz
   - Topics/Tags
   - Letztes Update-Datum
   - Öffentlich/Privat Status
 - ✅ Dark Mode Unterstützung
 - ✅ Deutsche Benutzeroberfläche
+- ✅ Sichere Token-Speicherung
+- ✅ XSS-geschützte Ausgaben
 
 ## Installation
 

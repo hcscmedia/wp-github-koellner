@@ -58,6 +58,9 @@ This document describes how the plugin looks and behaves when installed on a Wor
 │                  │  │                  │  │                  │
 │ ◉ JavaScript     │  │ ◉ PHP            │  │ ◉ TypeScript     │
 │ ⭐ 42  🔀 12     │  │ ⭐ 15  🔀 3      │  │ ⭐ 8   🔀 2      │
+│ 👁️ 38  🐛 5     │  │ 👁️ 12           │  │ 👁️ 6   🐛 1     │
+│                  │  │                  │  │                  │
+│ 📜 MIT License   │  │ 📜 GPL-2.0       │  │ 📜 Apache-2.0    │
 │                  │  │                  │  │                  │
 │ [react] [node]   │  │ [wordpress]      │  │ [react] [tsx]    │
 │                  │  │ [theme] [css]    │  │ [dashboard]      │

@@ -331,7 +331,27 @@ class WP_GitHub_Koellner {
                             <span class="meta-item forks">
                                 🔀 <?php echo number_format_i18n($repo['forks_count']); ?>
                             </span>
+                            
+                            <?php if (!empty($repo['watchers_count'])): ?>
+                                <span class="meta-item watchers">
+                                    👁️ <?php echo number_format_i18n($repo['watchers_count']); ?>
+                                </span>
+                            <?php endif; ?>
+                            
+                            <?php if (isset($repo['open_issues_count']) && $repo['open_issues_count'] > 0): ?>
+                                <span class="meta-item issues">
+                                    🐛 <?php echo number_format_i18n($repo['open_issues_count']); ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
+                        
+                        <?php if (!empty($repo['license']['name'])): ?>
+                            <div class="project-license">
+                                <span class="license-badge">
+                                    📜 <?php echo esc_html($repo['license']['name']); ?>
+                                </span>
+                            </div>
+                        <?php endif; ?>
                         
                         <?php if (!empty($repo['topics']) && is_array($repo['topics'])): ?>
                             <div class="project-topics">
